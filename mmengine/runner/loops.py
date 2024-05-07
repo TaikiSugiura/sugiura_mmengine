@@ -110,6 +110,7 @@ class EpochBasedTrainLoop(BaseLoop):
         self.runner.call_hook('before_train_epoch')
         self.runner.model.train()
         for idx, data_batch in enumerate(self.dataloader):
+            # batch:list[tensor->3*H*W]
             self.run_iter(idx, data_batch)
 
         self.runner.call_hook('after_train_epoch')
