@@ -459,7 +459,7 @@ class Runner:
             Runner: A runner build from ``cfg``.
         """
         cfg = copy.deepcopy(cfg)
-        print('cccccccccccccccccccccccccc')
+        print('dddddddddddddddddddd')
         runner = cls(
             model=cfg['model'],
             work_dir=cfg['work_dir'],
