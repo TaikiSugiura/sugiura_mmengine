@@ -126,13 +126,13 @@ else:
             install_requires.append(choose_requirement(main, secondary))
 
 setup(
-    name='mmengine'
+    name='sugiura_mmengine'
     if os.getenv('MMENGINE_LITE', '0') == '0' else 'mmengine-lite',
     version=get_version(),
     description='Engine of OpenMMLab projects',
     long_description=readme(),
     long_description_content_type='text/markdown',
-    url='https://github.com/open-mmlab/mmengine',
+    # url='https://github.com/open-mmlab/mmengine',
     author='MMEngine Authors',
     author_email='openmmlab@gmail.com',
     packages=find_packages(),
