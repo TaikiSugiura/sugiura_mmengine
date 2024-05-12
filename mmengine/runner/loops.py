@@ -14,6 +14,8 @@ from .amp import autocast
 from .base_loop import BaseLoop
 from .utils import calc_dynamic_intervals
 
+from .augmentation import Augmentation
+
 
 @LOOPS.register_module()
 class EpochBasedTrainLoop(BaseLoop):
@@ -111,6 +113,9 @@ class EpochBasedTrainLoop(BaseLoop):
         self.runner.model.train()
         for idx, data_batch in enumerate(self.dataloader):
             # batch:list[tensor->3*H*W]
+
+            data_batch=torch.stack(data_batch)
+
             self.run_iter(idx, data_batch)
 
         self.runner.call_hook('after_train_epoch')

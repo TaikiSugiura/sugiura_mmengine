@@ -1,0 +1,10 @@
+[submodule "MaskDINO"]
+	path = MaskDINO
+	url = https://github.com/tttamaki/MaskDINO.git
+	branch = pano_seg
+[submodule "SPADE"]
+	path = SPADE
+	url = https://github.com/NVlabs/SPADE
+[submodule "Mask2Former"]
+	path = Mask2Former
+	url = https://github.com/facebookresearch/Mask2Former.git
