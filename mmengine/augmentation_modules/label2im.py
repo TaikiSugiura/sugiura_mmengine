@@ -35,7 +35,6 @@ def label2image(
 
     id = torch.unique(label_map).cpu().numpy()
 
-    # TODO: make a class
     stuff_data = metadata.stuff_dataset_id_to_contiguous_id
     panoptic_id = np.array(list(stuff_data.keys()))
     stuff_id = panoptic_id[panoptic_id <= 182]
@@ -73,4 +72,4 @@ def label2image(
     if opt.paste:
         gen = person_paste(label.clone(), target.clone(), gen.clone())
 
-    return gen, label, not_paste
+    return gen

@@ -288,7 +288,9 @@ class Runner:
         randomness: Dict = dict(seed=None),
         experiment_name: Optional[str] = None,
         cfg: Optional[ConfigType] = None,
+        probability: float = 1.0
     ):
+        self.probability = probability
         self._work_dir = osp.abspath(work_dir)
         mmengine.mkdir_or_exist(self._work_dir)
 
@@ -1774,7 +1776,7 @@ class Runner:
         # This must be called **AFTER** model has been wrapped.
         self._maybe_compile('train_step')
 
-        model = self.train_loop.run()  # type: ignore
+        model = self.train_loop.run(self.probability)  # type: ignore
         self.call_hook('after_run')
         return model
 

@@ -33,7 +33,8 @@ class Augmentation():
 
         return label, instance
 
-    def augmentation(self, tensor):
+    def augmentation(self, tensor, probability):
+        print(probability)
         # tensor->b*c*H*W
         label, instance = self.panoptic_segmentation(tensor)
 

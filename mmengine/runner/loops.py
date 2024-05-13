@@ -90,12 +90,12 @@ class EpochBasedTrainLoop(BaseLoop):
         """int: Current iteration."""
         return self._iter
 
-    def run(self) -> torch.nn.Module:
+    def run(self, probability) -> torch.nn.Module:
         """Launch training."""
         self.runner.call_hook('before_train')
 
         while self._epoch < self._max_epochs and not self.stop_training:
-            self.run_epoch()
+            self.run_epoch(probability)
 
             self._decide_current_val_interval()
             if (self.runner.val_loop is not None
@@ -107,7 +107,7 @@ class EpochBasedTrainLoop(BaseLoop):
         self.runner.call_hook('after_train')
         return self.runner.model
 
-    def run_epoch(self) -> None:
+    def run_epoch(self, probability) -> None:
         """Iterate one epoch."""
         self.runner.call_hook('before_train_epoch')
         self.runner.model.train()
@@ -115,6 +115,7 @@ class EpochBasedTrainLoop(BaseLoop):
             # batch:list[tensor->3*H*W]
 
             data_batch=torch.stack(data_batch)
+            Augmentation.augmentation(data_batch, probability)
 
             self.run_iter(idx, data_batch)
 
