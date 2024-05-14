@@ -7,4 +7,4 @@ from . import (
     segmentor,
     generator
 )
-from segmentation import segmentation
+from mmengine.runner.augmentation_modules.SegGen.segmentation import segmentation

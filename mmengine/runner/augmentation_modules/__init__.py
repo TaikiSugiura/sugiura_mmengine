@@ -1,1 +1,1 @@
-from .SegGen import seggen
+from mmengine.runner.augmentation_modules.SegGen import seggen
