@@ -1,1 +1,1 @@
-from .seggen import segmentaion
+from seggen import segmentaion

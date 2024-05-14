@@ -1,1 +1,1 @@
-from .SegGen import segmentation
+from SegGen import segmentation
