@@ -1,1 +1,1 @@
-from SegGen import seggen
+from .SegGen import seggen
