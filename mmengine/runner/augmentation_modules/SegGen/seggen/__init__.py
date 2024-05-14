@@ -7,3 +7,4 @@ from . import (
     segmentor,
     generator
 )
+from segmentation import segmentation
