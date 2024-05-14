@@ -1,5 +1,5 @@
 import sys
-sys.path.append("../augmentation_modules/SegGen/seggen")
+sys.path.append("..sugiura_mmengine/mmengine/augmentation_modules/SegGen/seggen")
 from segmentation import segmentation
 from model_factory import get_segmentor, get_generator
 
