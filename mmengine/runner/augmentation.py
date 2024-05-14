@@ -1,11 +1,8 @@
-# import sys
-# sys.path.append("..sugiura_mmengine/mmengine/augmentation_modules/SegGen/seggen")
 from .augmentation_modules.SegGen.seggen.segmentation import segmentation
-from model_factory import get_segmentor, get_generator
+from .augmentation_modules.SegGen.seggen.model_factory import get_segmentor, get_generator
 
 from detectron2.data import MetadataCatalog
 
-# sys.path.append("../augmentation_modules")
 from config import factory
 from convert_label import convert_label
 from label2im import label2image
