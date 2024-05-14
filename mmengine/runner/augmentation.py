@@ -1,4 +1,4 @@
-from mmengine.runner.augmentation_modules import segmentation
+from . import augmentation_modules.SegGen.seggen.segmentation.segmentation
 from .augmentation_modules.SegGen.seggen.model_factory import get_segmentor, get_generator
 
 from detectron2.data import MetadataCatalog
