@@ -1,1 +1,1 @@
-from mmengine.runner.augmentation_modules.SegGen import segmentation
+from .SegGen import segmentation
