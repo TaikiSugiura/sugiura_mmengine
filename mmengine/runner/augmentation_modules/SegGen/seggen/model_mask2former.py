@@ -5,14 +5,9 @@ from detectron2.modeling import build_model
 from detectron2.projects.deeplab import add_deeplab_config
 from typing import Tuple
 
-import sys
-sys.path.append("../SegGen/Mask2Former")
-sys.path.append("../../SegGen/Mask2Former")
-from mask2former import add_maskformer2_config
+from ..Mask2Former import add_maskformer2_config
 
-sys.path.append("../SegGen/seggen")
-sys.path.append("../../SegGen/seggen")
-from segmentor import Segmentor
+from .segmentor import Segmentor
 
 
 class Mask2FormerSegmentor(Segmentor):
@@ -24,9 +19,9 @@ class Mask2FormerSegmentor(Segmentor):
         add_maskformer2_config(cfg)
         if arch_type == "swin":
             cfg.merge_from_file(
-                '../SegGen/Mask2Former/configs/coco/panoptic-segmentation/swin/maskformer2_swin_large_IN21k_384_bs16_100ep.yaml')
+                '/mnt/HDD10TB-1/sugiura/sugiura_mmengine/mmengine/runner/augmentation_modules/SegGen/Mask2Former/configs/coco/panoptic-segmentation/swin/maskformer2_swin_large_IN21k_384_bs16_100ep.yaml')
             cfg.MODEL.WEIGHTS = \
-                '../SegGen/Mask2Former/checkpoints/coco/panoptic/maskformer2_swin_large_IN21k_384_bs16_100ep/model_final_f07440.pkl'
+                '/mnt/HDD10TB-1/sugiura/sugiura_mmengine/mmengine/runner/augmentation_modules/SegGen/Mask2Former/checkpoints/coco/panoptic/maskformer2_swin_large_IN21k_384_bs16_100ep/model_final_f07440.pkl'
         if arch_type == "resnet":
             cfg.merge_from_file(
                 '../SegGen/Mask2Former/configs/coco/panoptic-segmentation/maskformer2_R101_bs16_50ep.yaml')

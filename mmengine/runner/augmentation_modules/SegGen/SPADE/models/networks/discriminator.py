@@ -6,9 +6,9 @@ Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses
 import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
-from models.networks.base_network import BaseNetwork
-from models.networks.normalization import get_nonspade_norm_layer
-import util.util as util
+from .base_network import BaseNetwork
+from .normalization import get_nonspade_norm_layer
+from ...util import util
 
 
 class MultiscaleDiscriminator(BaseNetwork):

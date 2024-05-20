@@ -6,10 +6,10 @@ Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from models.networks.base_network import BaseNetwork
-from models.networks.normalization import get_nonspade_norm_layer
-from models.networks.architecture import ResnetBlock as ResnetBlock
-from models.networks.architecture import SPADEResnetBlock as SPADEResnetBlock
+from .base_network import BaseNetwork
+from .normalization import get_nonspade_norm_layer
+from .architecture import ResnetBlock as ResnetBlock
+from .architecture import SPADEResnetBlock as SPADEResnetBlock
 
 
 class SPADEGenerator(BaseNetwork):
@@ -35,7 +35,7 @@ class SPADEGenerator(BaseNetwork):
         else:
             # Otherwise, we make the network deterministic by starting with
             # downsampled segmentation map instead of random z
-            self.fc = nn.Conv2d(self.opt.semantic_nc, 16 * nf, 3, padding=1)
+            self.fc = nn.Conv2d(184, 16 * nf, 3, padding=1)
 
         self.head_0 = SPADEResnetBlock(16 * nf, 16 * nf, opt)
 
@@ -56,7 +56,8 @@ class SPADEGenerator(BaseNetwork):
         self.conv_img = nn.Conv2d(final_nc, 3, 3, padding=1)
 
         self.up = nn.Upsample(scale_factor=2)
-        self.final_up = nn.Upsample(size=self.opt.crop_size)
+        self.final_up = nn.Upsample(size=(256, 192))
+
 
     def compute_latent_vector_size(self, opt):
         if opt.num_upsampling_layers == 'normal':
@@ -69,8 +70,10 @@ class SPADEGenerator(BaseNetwork):
             raise ValueError('opt.num_upsampling_layers [%s] not recognized' %
                              opt.num_upsampling_layers)
 
-        sw = opt.crop_size // (2**num_up_layers)
-        sh = round(sw / opt.aspect_ratio)
+        width = 256
+        height = 192
+        sw = width // (2**num_up_layers)
+        sh = height // (2**num_up_layers)
 
         return sw, sh
 

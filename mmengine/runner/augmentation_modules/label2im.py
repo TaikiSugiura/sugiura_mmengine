@@ -1,8 +1,8 @@
 import torch
 import numpy as np
 from numpy.random import default_rng
-from person_paste import person_paste
-from category_sampling import (
+from .person_paste import person_paste
+from .category_sampling import (
     semantic_sampling,
     random_sampling
 )
@@ -70,6 +70,6 @@ def label2image(
     not_paste = gen.clone()
 
     if opt.paste:
-        gen = person_paste(label.clone(), target.clone(), gen.clone())
+        gen = person_paste(label.clone(), target.clone().to('cuda:0'), gen.clone())
 
     return gen

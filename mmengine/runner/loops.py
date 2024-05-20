@@ -15,6 +15,7 @@ from .base_loop import BaseLoop
 from .utils import calc_dynamic_intervals
 
 from .augmentation import Augmentation
+from .augmentation_modules import comet
 
 
 @LOOPS.register_module()
@@ -90,39 +91,43 @@ class EpochBasedTrainLoop(BaseLoop):
         """int: Current iteration."""
         return self._iter
 
-    def run(self, probability) -> torch.nn.Module:
+    def run(self) -> torch.nn.Module:
+        augmentation = Augmentation()
+        experiment = comet()
         """Launch training."""
         self.runner.call_hook('before_train')
-
         while self._epoch < self._max_epochs and not self.stop_training:
-            self.run_epoch(probability)
+            self.run_epoch(experiment, augmentation)
 
             self._decide_current_val_interval()
             if (self.runner.val_loop is not None
                     and self._epoch >= self.val_begin
                     and (self._epoch % self.val_interval == 0
                          or self._epoch == self._max_epochs)):
-                self.runner.val_loop.run()
+                self.runner.val_loop.run(experiment)
 
         self.runner.call_hook('after_train')
         return self.runner.model
 
-    def run_epoch(self, probability) -> None:
+    def run_epoch(self, experiment, augmentation) -> None:
         """Iterate one epoch."""
         self.runner.call_hook('before_train_epoch')
         self.runner.model.train()
         for idx, data_batch in enumerate(self.dataloader):
-            # batch:list[tensor->3*H*W]
+            # data_batch:dict[inputs: list[tensor->3*H*W], data_sample: ...]
+            inputs = data_batch['inputs']
 
-            data_batch=torch.stack(data_batch)
-            Augmentation.augmentation(data_batch, probability)
+            inputs = torch.stack(inputs)
+            gen = augmentation.augmentation(inputs)
+            inputs = [gen[i] for i in range(gen.size(0))]
+            data_batch['inputs'] = inputs
 
-            self.run_iter(idx, data_batch)
+            self.run_iter(idx, data_batch, experiment)
 
         self.runner.call_hook('after_train_epoch')
         self._epoch += 1
 
-    def run_iter(self, idx, data_batch: Sequence[dict]) -> None:
+    def run_iter(self, idx, data_batch: Sequence[dict], experiment) -> None:
         """Iterate one min-batch.
 
         Args:
@@ -135,6 +140,13 @@ class EpochBasedTrainLoop(BaseLoop):
         # outputs should be a dict of loss.
         outputs = self.runner.model.train_step(
             data_batch, optim_wrapper=self.runner.optim_wrapper)
+
+        experiment.log_metric(
+                "train_iter_loss", outputs['loss'].item(), step=idx
+            )
+        experiment.log_metric(
+                "train_acc_pose", outputs['acc_pose'].item(), step=idx
+            )
 
         self.runner.call_hook(
             'after_train_iter',
@@ -371,22 +383,23 @@ class ValLoop(BaseLoop):
                 level=logging.WARNING)
         self.fp16 = fp16
 
-    def run(self) -> dict:
+    def run(self, experiment) -> dict:
         """Launch validation."""
         self.runner.call_hook('before_val')
         self.runner.call_hook('before_val_epoch')
         self.runner.model.eval()
         for idx, data_batch in enumerate(self.dataloader):
-            self.run_iter(idx, data_batch)
+            self.run_iter(idx, data_batch, experiment)
 
         # compute metrics
         metrics = self.evaluator.evaluate(len(self.dataloader.dataset))
+        print(metrics)
         self.runner.call_hook('after_val_epoch', metrics=metrics)
         self.runner.call_hook('after_val')
         return metrics
 
     @torch.no_grad()
-    def run_iter(self, idx, data_batch: Sequence[dict]):
+    def run_iter(self, idx, data_batch: Sequence[dict], experiment):
         """Iterate one mini-batch.
 
         Args:
@@ -399,6 +412,16 @@ class ValLoop(BaseLoop):
         with autocast(enabled=self.fp16):
             outputs = self.runner.model.val_step(data_batch)
         self.evaluator.process(data_samples=outputs, data_batch=data_batch)
+
+        # print(outputs[0])
+        # print(type(outputs[0]))
+        # experiment.log_metric(
+        #         "val_iter_loss", outputs['loss'].item(), step=idx
+        #     )
+        # experiment.log_metric(
+        #         "val_acc_pose", outputs['acc_pose'].item(), step=idx
+        #     )
+
         self.runner.call_hook(
             'after_val_iter',
             batch_idx=idx,

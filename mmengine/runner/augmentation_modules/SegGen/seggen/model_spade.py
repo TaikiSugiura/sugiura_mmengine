@@ -5,13 +5,8 @@ import numpy as np
 import sys
 import torch
 
-sys.path.append("../SegGen/SPADE")
-sys.path.append("../../SegGen/SPADE")  # nopep8
-from models.pix2pix_model import Pix2PixModel  # nopep8
-
-sys.path.append("../SegGen/seggen")
-sys.path.append("../../SegGen/seggen")
-from generator import Generator
+from ..SPADE import Pix2PixModel  # nopep8
+from .generator import Generator
 
 
 rng = default_rng()

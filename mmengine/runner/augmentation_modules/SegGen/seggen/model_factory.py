@@ -1,10 +1,7 @@
-import sys
-sys.path.append("../SegGen/seggen")
-sys.path.append("../../SegGen/seggen")
-from model_mask2former import Mask2FormerSegmentor
+from .model_mask2former import Mask2FormerSegmentor
 # from model_maskdino import MaskDINOSegmentor
 # from model_maskrcnn import MaskRCNNSegmentor
-from model_spade import SPADEGenerator
+from .model_spade import SPADEGenerator
 
 
 def get_segmentor(model_name: str, gpu_id: int = 0, arch_type: str = "swin"):

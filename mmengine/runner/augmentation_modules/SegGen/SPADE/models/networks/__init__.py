@@ -4,18 +4,44 @@ Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses
 """
 
 import torch
-from models.networks.base_network import BaseNetwork
-from models.networks.loss import *
-from models.networks.discriminator import *
-from models.networks.generator import *
-from models.networks.encoder import *
-import util.util as util
+from .base_network import BaseNetwork
+from .loss import *
+from .discriminator import *
+from .generator import *
+from .encoder import *
+from ...util import util
 
+from . import generator
+from . import encoder
+from . import discriminator
+
+def find_class_in_module(target_cls_name, module_name):
+    target_cls_name = target_cls_name.replace('_', '').lower()
+
+    # モジュールオブジェクトを選択
+    if module_name == "models.networks.generator":
+        clslib = generator
+    elif module_name == "models.networks.encoder":
+        clslib = encoder
+    else:
+        clslib = discriminator
+
+    cls = None
+    # モジュールの辞書を走査して、条件に合うクラスを探す
+    for name, clsobj in clslib.__dict__.items():
+        if name.lower() == target_cls_name:
+            cls = clsobj
+
+    if cls is None:
+        print(f"In {module_name}, there should be a class whose name matches {target_cls_name} in lowercase without underscore(_)")
+        exit(0)
+
+    return cls
 
 def find_network_using_name(target_network_name, filename):
     target_class_name = target_network_name + filename
     module_name = 'models.networks.' + filename
-    network = util.find_class_in_module(target_class_name, module_name)
+    network = find_class_in_module(target_class_name, module_name)
 
     assert issubclass(network, BaseNetwork), \
         "Class %s should be a subclass of BaseNetwork" % network
@@ -45,6 +71,7 @@ def create_network(cls, opt):
         net.cuda()
     net.init_weights(opt.init_type, opt.init_variance)
     return net
+
 
 
 def define_G(opt):

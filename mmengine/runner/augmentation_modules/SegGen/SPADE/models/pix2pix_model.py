@@ -4,8 +4,8 @@ Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses
 """
 
 import torch
-import models.networks as networks
-import util.util as util
+from . import networks
+from ..util import util
 
 
 class Pix2PixModel(torch.nn.Module):
@@ -17,10 +17,12 @@ class Pix2PixModel(torch.nn.Module):
     def __init__(self, opt):
         super().__init__()
         self.opt = opt
-        self.FloatTensor = torch.cuda.FloatTensor if self.use_gpu() \
-            else torch.FloatTensor
-        self.ByteTensor = torch.cuda.ByteTensor if self.use_gpu() \
-            else torch.ByteTensor
+        # self.FloatTensor = torch.cuda.FloatTensor if self.use_gpu() \
+        #     else torch.FloatTensor
+        # self.ByteTensor = torch.cuda.ByteTensor if self.use_gpu() \
+        #     else torch.ByteTensor
+        self.FloatTensor = torch.cuda.FloatTensor
+        self.ByteTensor = torch.cuda.ByteTensor
 
         self.netG, self.netD, self.netE = self.initialize_networks(opt)
 

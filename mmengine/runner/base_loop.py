@@ -33,5 +33,5 @@ class BaseLoop(metaclass=ABCMeta):
         return self._runner
 
     @abstractmethod
-    def run(self) -> Any:
+    def run(self, experiment) -> Any:
         """Execute loop."""
