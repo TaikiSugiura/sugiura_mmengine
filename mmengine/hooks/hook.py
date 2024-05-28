@@ -21,6 +21,67 @@ class Hook:
               'before_test', 'before_test_epoch', 'before_test_iter',
               'after_test_iter', 'after_test_epoch', 'after_test', 'after_run')
 
+    def train_iter_comet(
+        self,
+        runner,
+        experiment: None,
+        idx: int,
+        outputs: Optional[dict] = None
+    ) -> None:
+        experiment.log_metric(
+            "train_iter_loss", outputs['loss'].item(), step=idx
+        )
+        experiment.log_metric(
+            "train_acc_pose", outputs['acc_pose'].item(), step=idx
+        )
+
+    # def val_iter_comet(
+    #     self,
+    #     runner,
+    #     experiment: None,
+    #     idx: int,
+    #     outputs: Optional[dict] = None
+    # ) -> None:
+    #     print(idx)
+    #     print(outputs)
+
+    def val_comet(
+        self,
+        runner,
+        experiment: None,
+        metrics: None
+    ) -> None:
+        experiment.log_metric(
+            "coco/AP", metrics['coco/AP'], step=0
+        )
+        experiment.log_metric(
+            "coco/AP .5", metrics['coco/AP .5'], step=0
+        )
+        experiment.log_metric(
+            "coco/AP .75", metrics['coco/AP .75'], step=0
+        )
+        experiment.log_metric(
+            "coco/AP (M)", metrics['coco/AP (M)'], step=0
+        )
+        experiment.log_metric(
+            "coco/AP (L)", metrics['coco/AP (L)'], step=0
+        )
+        experiment.log_metric(
+            "coco/AR", metrics['coco/AR'], step=0
+        )
+        experiment.log_metric(
+            "coco/AR .5", metrics['coco/AR .5'], step=0
+        )
+        experiment.log_metric(
+            "coco/AR .75", metrics['coco/AR .75'], step=0
+        )
+        experiment.log_metric(
+            "coco/AR (M)", metrics['coco/AR (M)'], step=0
+        )
+        experiment.log_metric(
+            "coco/AR (L)", metrics['coco/AR (L)'], step=0
+        )
+
     def before_run(self, runner) -> None:
         """All subclasses should override this method, if they need any
         operations before the training validation or testing process.

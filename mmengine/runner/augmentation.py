@@ -9,6 +9,9 @@ from .augmentation_modules import label2image
 
 import pickle
 import random
+import torch
+from torchvision.utils import save_image
+import os
 
 
 class Augmentation():
@@ -35,20 +38,44 @@ class Augmentation():
         def use_augmentation(probability):
             return False if random.random() >= probability else True
 
+        def save_tensor_as_images(tensor, output_dir, file_prefix="image"):
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+
+            # Save each image in the batch
+            for i in range(tensor.size(0)):
+                save_path = os.path.join(output_dir, f"{file_prefix}_{i}.png")
+                save_image(tensor[i], save_path)
+
         if not use_augmentation(self.opt.probability):
+            print(torch.max(tensor))
+            save_tensor_as_images(
+                (tensor.clone())/255,
+                "/mnt/HDD10TB-1/sugiura/2024_sugiura_mmpose/tools/videos/not",
+            )
             return tensor
         else:
             # tensor->b*c*H*W
-            label, instance = self.panoptic_segmentation(tensor)
+            label, instance = self.panoptic_segmentation(tensor.clone())
 
             gen = label2image(
                 self.spade.model,
                 convert_label(label.clone()),
                 instance,
-                tensor,
+                (tensor.clone())/255,
                 self.opt,
                 self.category_distance,
                 self.metadata
             )
 
-            return gen
+            # gen = ((gen+1)/2).clamp(0, 1).type(torch.FloatTensor)
+            save_tensor_as_images(
+                (tensor.clone())/255,
+                "/mnt/HDD10TB-1/sugiura/2024_sugiura_mmpose/tools/videos/original",
+            )
+            save_tensor_as_images(
+                gen.clone(),
+                "/mnt/HDD10TB-1/sugiura/2024_sugiura_mmpose/tools/videos/gen",
+            )
+
+            return gen * 255

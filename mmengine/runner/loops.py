@@ -97,7 +97,7 @@ class EpochBasedTrainLoop(BaseLoop):
         """Launch training."""
         self.runner.call_hook('before_train')
         while self._epoch < self._max_epochs and not self.stop_training:
-            self.run_epoch(experiment, augmentation)
+            self.run_epoch(augmentation, experiment)
 
             self._decide_current_val_interval()
             if (self.runner.val_loop is not None
@@ -109,7 +109,7 @@ class EpochBasedTrainLoop(BaseLoop):
         self.runner.call_hook('after_train')
         return self.runner.model
 
-    def run_epoch(self, experiment, augmentation) -> None:
+    def run_epoch(self, augmentation, experiment) -> None:
         """Iterate one epoch."""
         self.runner.call_hook('before_train_epoch')
         self.runner.model.train()
@@ -141,12 +141,12 @@ class EpochBasedTrainLoop(BaseLoop):
         outputs = self.runner.model.train_step(
             data_batch, optim_wrapper=self.runner.optim_wrapper)
 
-        experiment.log_metric(
-                "train_iter_loss", outputs['loss'].item(), step=idx
-            )
-        experiment.log_metric(
-                "train_acc_pose", outputs['acc_pose'].item(), step=idx
-            )
+        self.runner.call_hook(
+            'train_iter_comet',
+            experiment=experiment,
+            idx=idx,
+            outputs=outputs,
+        )
 
         self.runner.call_hook(
             'after_train_iter',
@@ -390,10 +390,15 @@ class ValLoop(BaseLoop):
         self.runner.model.eval()
         for idx, data_batch in enumerate(self.dataloader):
             self.run_iter(idx, data_batch, experiment)
-
         # compute metrics
         metrics = self.evaluator.evaluate(len(self.dataloader.dataset))
-        print(metrics)
+
+        self.runner.call_hook(
+            'val_comet',
+            metrics=metrics,
+            experiment=experiment
+        )
+
         self.runner.call_hook('after_val_epoch', metrics=metrics)
         self.runner.call_hook('after_val')
         return metrics
@@ -413,15 +418,12 @@ class ValLoop(BaseLoop):
             outputs = self.runner.model.val_step(data_batch)
         self.evaluator.process(data_samples=outputs, data_batch=data_batch)
 
-        # print(outputs[0])
-        # print(type(outputs[0]))
-        # experiment.log_metric(
-        #         "val_iter_loss", outputs['loss'].item(), step=idx
-        #     )
-        # experiment.log_metric(
-        #         "val_acc_pose", outputs['acc_pose'].item(), step=idx
-        #     )
-
+        # self.runner.call_hook(
+        #     'val_iter_comet',
+        #     idx=idx,
+        #     outputs=outputs,
+        #     experiment=experiment
+        # )
         self.runner.call_hook(
             'after_val_iter',
             batch_idx=idx,

@@ -24,4 +24,4 @@ class Config:
     category_sampling: str = 'Semantic'
     shift: bool = True
     paste: bool = True
-    probability: float = 0.6
+    probability: float = 0.8
